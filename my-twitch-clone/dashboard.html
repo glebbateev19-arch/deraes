@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет — Python School</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-wrapper">
+                <div class="logo">
+                    <span class="logo-icon">🐍</span>
+                    <span class="logo-text">Python<span class="highlight">School</span></span>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <a href="index.html">Главная</a>
+                    <a href="course.html">Курсы</a>
+                    <a href="dashboard.html" class="active">Личный кабинет</a>
+                    <a href="#" onclick="logout()">Выйти</a>
+                </nav>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <div class="user-avatar">👨‍💻</div>
+                    <div>
+                        <h1>Добро пожаловать, <span id="userName">Студент!</span></h1>
+                        <p class="user-email" id="userEmail">student@python.school</p>
+                        <p class="user-status" style="font-size:13px;color:var(--text-muted);">
+                            Статус: <span id="userPaidStatus">❌ Курс не куплен</span>
+                        </p>
+                        <p class="user-role" id="userRole" style="font-size:12px;color:var(--text-muted);"></p>
+                    </div>
+                </div>
+                <div class="user-stats">
+                    <div class="stat-badge">
+                        <span class="stat-number" id="coursesCount">0</span>
+                        <span class="stat-label">Курсов</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-number" id="lessonsCompleted">0</span>
+                        <span class="stat-label">Уроков пройдено</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-number" id="totalHours">0</span>
+                        <span class="stat-label">Часов обучения</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" onclick="switchTab('progress')">📊 Прогресс</button>
+                <button class="tab-btn" onclick="switchTab('files')">📁 Мои исходники</button>
+                <button class="tab-btn" onclick="switchTab('history')">💰 История</button>
+                <button class="tab-btn" onclick="switchTab('settings')">⚙️ Настройки</button>
+            </div>
+
+            <!-- Вкладка: Прогресс -->
+            <div class="tab-content active" id="tab-progress">
+                <div class="course-progress-card">
+                    <div class="course-card-header">
+                        <h3>Python для начинающих</h3>
+                        <span class="course-status" id="courseStatus">В процессе</span>
+                    </div>
+                    <div class="course-progress-bar">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="dashboardProgressFill" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text" id="dashboardProgressText">0%</span>
+                    </div>
+                    <div class="course-actions">
+                        <a href="course.html" class="btn btn-primary">Продолжить обучение</a>
+                        <button class="btn btn-secondary" onclick="downloadAllSources()">📦 Скачать все исходники</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вкладка: Исходники -->
+            <div class="tab-content" id="tab-files">
+                <div class="files-library">
+                    <h3>📁 Библиотека исходников</h3>
+                    <div id="filesAccessMessage" style="padding:20px;background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border-color);margin-bottom:20px;">
+                        <p id="filesAccessText">💳 Купите курс, чтобы получить доступ к исходникам</p>
+                        <button class="btn btn-primary" onclick="purchaseCourse()">💳 Купить курс</button>
+                    </div>
+                    <div class="files-grid" id="filesGrid"></div>
+                </div>
+            </div>
+
+            <!-- Вкладка: История -->
+            <div class="tab-content" id="tab-history">
+                <div class="history-list">
+                    <h3>💰 История платежей</h3>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Курс</th>
+                                    <th>Сумма</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вкладка: Настройки -->
+            <div class="tab-content" id="tab-settings">
+                <div class="settings-form">
+                    <h3>⚙️ Настройки профиля</h3>
+                    <form id="settingsForm" onsubmit="updateSettings(event)">
+                        <div class="form-group">
+                            <label>Имя пользователя</label>
+                            <input type="text" id="settingsName" value="Студент">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="settingsEmail" value="student@python.school">
+                        </div>
+                        <div class="form-group">
+                            <label>Новый пароль</label>
+                            <input type="password" id="settingsPassword" placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Модалка оплаты -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closePaymentModal()">&times;</span>
+            <h2>💳 Оплата через ЮMoney</h2>
+            <div id="paymentModalContent">
+                <p>Вы оплачиваете курс: <strong>Python для начинающих</strong></p>
+                <p style="font-size:28px;font-weight:700;color:var(--primary-light);">4 990 ₽</p>
+                <div style="background:var(--bg-dark);padding:16px;border-radius:10px;margin:16px 0;text-align:left;">
+                    <p style="font-size:13px;color:var(--text-secondary);">💳 Для оплаты переведите сумму на кошелёк ЮMoney:</p>
+                    <p style="font-size:18px;font-weight:600;color:var(--primary-light);">4100111111111111</p>
+                    <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">В комментарии укажите ваш email</p>
+                </div>
+                <button class="btn btn-success btn-block" onclick="processPayment()">
+                    ✅ Я оплатил(а), проверить
+                </button>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">
+                    🔒 После оплаты нажмите "Проверить" — доступ откроется автоматически
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка входа -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAuthModal()">&times;</span>
+            <h2>🔐 Вход в систему</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="student@python.school" required>
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Войти</button>
+                <p class="form-hint">
+                    👤 Студент: student@python.school / python123<br>
+                    👤 Админ: admin@python.school / admin123
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

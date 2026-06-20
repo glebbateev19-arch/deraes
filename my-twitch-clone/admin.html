@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель — Python School</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 0;
+            min-height: calc(100vh - 80px);
+        }
+        .admin-sidebar {
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+        .admin-sidebar .sidebar-title {
+            padding: 0 20px 16px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .admin-sidebar .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+            font-size: 14px;
+        }
+        .admin-sidebar .nav-item:hover {
+            background: rgba(255,255,255,0.03);
+            color: var(--text-primary);
+        }
+        .admin-sidebar .nav-item.active {
+            color: var(--text-primary);
+            border-left-color: var(--primary);
+            background: rgba(108,99,255,0.08);
+        }
+        .admin-sidebar .nav-item .badge {
+            margin-left: auto;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .admin-content {
+            padding: 30px 36px;
+            background: var(--bg-dark);
+        }
+        .admin-content .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .admin-content .page-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+        .admin-table-wrapper {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .admin-table th {
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.02);
+        }
+        .admin-table td {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .admin-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-badge.paid { background: rgba(76,175,80,0.15); color: #4CAF50; }
+        .status-badge.unpaid { background: rgba(255,101,132,0.15); color: #FF6584; }
+        .status-badge.pending { background: rgba(255,193,7,0.15); color: #FFC107; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            padding: 18px 22px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+        }
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .stat-card .stat-label {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 2px;
+        }
+        .admin-form {
+            background: var(--bg-card);
+            padding: 28px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            max-width: 580px;
+        }
+        .admin-form .form-group { margin-bottom: 16px; }
+        .admin-form .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .admin-form .form-group input,
+        .admin-form .form-group textarea,
+        .admin-form .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+        .admin-form .form-group input:focus,
+        .admin-form .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
+        }
+        .admin-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        .btn-sm { padding: 4px 12px; font-size: 12px; }
+        .btn-danger { background: rgba(255,101,132,0.1); color: #FF6584; }
+        .btn-danger:hover { background: rgba(255,101,132,0.2); }
+        
+        .access-denied {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+        }
+        .access-denied .lock-icon { font-size: 80px; margin-bottom: 20px; }
+        .access-denied h1 { font-size: 32px; margin-bottom: 12px; }
+        .access-denied p { color: var(--text-muted); font-size: 16px; max-width: 400px; }
+
+        /* Preview видео в админке */
+        .video-preview {
+            max-width: 200px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        @media (max-width: 1024px) {
+            .admin-container { grid-template-columns: 1fr; }
+            .admin-sidebar {
+                position: static;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                padding: 12px 16px;
+            }
+            .admin-sidebar .sidebar-title { display: none; }
+            .admin-sidebar .nav-item { padding: 6px 14px; border-left: none; border-radius: 8px; font-size: 13px; }
+            .admin-sidebar .nav-item.active { border-left: none; background: var(--primary); color: white; }
+            .admin-content { padding: 16px; }
+            .admin-form .form-row { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .admin-table { font-size: 12px; }
+            .admin-table th, .admin-table td { padding: 8px 10px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .admin-form { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-wrapper">
+                <div class="logo">
+                    <span class="logo-icon">🐍</span>
+                    <span class="logo-text">Python<span class="highlight">School</span></span>
+                    <span style="font-size:11px;background:var(--primary);padding:2px 12px;border-radius:12px;margin-left:8px;">ADMIN</span>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <a href="index.html">Главная</a>
+                    <a href="course.html">Курсы</a>
+                    <a href="dashboard.html">Личный кабинет</a>
+                    <a href="#" onclick="logout()">Выйти</a>
+                </nav>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <div id="adminContent" style="display:none;">
+        <div class="admin-container">
+            <aside class="admin-sidebar">
+                <div class="sidebar-title">📋 Меню</div>
+                <div class="nav-item active" onclick="switchAdminSection('dashboard')">📊 Панель</div>
+                <div class="nav-item" onclick="switchAdminSection('students')">👨‍🎓 Студенты <span class="badge" id="studentsBadge">0</span></div>
+                <div class="nav-item" onclick="switchAdminSection('courses')">📚 Курсы <span class="badge" id="coursesBadge">0</span></div>
+                <div class="nav-item" onclick="switchAdminSection('videos')">🎬 Видео <span class="badge" id="videosBadge">0</span></div>
+                <div class="nav-item" onclick="switchAdminSection('files')">📦 Исходники <span class="badge" id="filesBadge">0</span></div>
+                <div class="nav-item" onclick="switchAdminSection('payments')">💳 Оплаты <span class="badge" id="paymentsBadge">0</span></div>
+                <div class="nav-item" onclick="switchAdminSection('settings')">⚙️ Настройки</div>
+                <div class="nav-item" onclick="exportData()" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">📤 Экспорт</div>
+            </aside>
+
+            <main class="admin-content">
+                <!-- DASHBOARD -->
+                <div class="admin-section active" id="section-dashboard">
+                    <h1 class="page-title">📊 Панель управления</h1>
+                    <p class="page-subtitle">Общая статистика платформы</p>
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-card"><div class="stat-value" id="statStudents">0</div><div class="stat-label">👨‍🎓 Студентов</div></div>
+                        <div class="stat-card"><div class="stat-value" id="statPaid">0</div><div class="stat-label">💰 Оплатили</div></div>
+                        <div class="stat-card"><div class="stat-value" id="statLessons">0</div><div class="stat-label">📹 Уроков</div></div>
+                        <div class="stat-card"><div class="stat-value" id="statRevenue">0 ₽</div><div class="stat-label">💵 Выручка</div></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                        <div class="admin-table-wrapper">
+                            <div style="padding:12px 18px;border-bottom:1px solid var(--border-color);font-weight:600;font-size:14px;">🕐 Последние студенты</div>
+                            <table class="admin-table"><tbody id="recentStudentsBody"></tbody></table>
+                        </div>
+                        <div class="admin-table-wrapper">
+                            <div style="padding:12px 18px;border-bottom:1px solid var(--border-color);font-weight:600;font-size:14px;">🎬 Последние видео</div>
+                            <table class="admin-table"><tbody id="recentVideosBody"></tbody></table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STUDENTS -->
+                <div class="admin-section" id="section-students">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+                        <div><h1 class="page-title" style="margin-bottom:0;">👨‍🎓 Студенты</h1></div>
+                        <button class="btn btn-primary" onclick="addStudent()">+ Добавить</button>
+                    </div>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead><tr><th>#</th><th>Имя</th><th>Email</th><th>Курс</th><th>Оплата</th><th>Прогресс</th><th>Действия</th></tr></thead>
+                            <tbody id="studentsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- COURSES -->
+                <div class="admin-section" id="section-courses">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+                        <div><h1 class="page-title" style="margin-bottom:0;">📚 Курсы</h1></div>
+                        <button class="btn btn-primary" onclick="document.getElementById('addCourseForm').style.display='block';document.getElementById('addCourseForm').scrollIntoView({behavior:'smooth'});">+ Создать</button>
+                    </div>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead><tr><th>Название</th><th>Цена</th><th>Уроков</th><th>Студентов</th><th>Действия</th></tr></thead>
+                            <tbody id="coursesBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="addCourseForm" style="display:none;margin-top:20px;">
+                        <div class="admin-form">
+                            <h3 style="margin-bottom:16px;">📚 Новый курс</h3>
+                            <form onsubmit="createCourse(event)">
+                                <div class="form-group"><label>Название</label><input type="text" id="courseTitle" required></div>
+                                <div class="form-group"><label>Описание</label><textarea id="courseDescription" rows="2"></textarea></div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Цена (₽)</label><input type="number" id="coursePrice" value="4990"></div>
+                                    <div class="form-group"><label>Уровень</label><select id="courseLevel"><option value="0">Начинающий</option><option value="1">Junior</option></select></div>
+                                </div>
+                                <div style="display:flex;gap:10px;">
+                                    <button type="submit" class="btn btn-primary">Создать</button>
+                                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addCourseForm').style.display='none'">Отмена</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIDEOS - с загрузкой видео -->
+                <div class="admin-section" id="section-videos">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+                        <div><h1 class="page-title" style="margin-bottom:0;">🎬 Видео</h1></div>
+                        <button class="btn btn-primary" onclick="document.getElementById('addVideoForm').style.display='block';document.getElementById('addVideoForm').scrollIntoView({behavior:'smooth'});">+ Загрузить видео</button>
+                    </div>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead><tr><th>Название</th><th>Курс</th><th>Длительность</th><th>Превью</th><th>Действия</th></tr></thead>
+                            <tbody id="videosBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="addVideoForm" style="display:none;margin-top:20px;">
+                        <div class="admin-form">
+                            <h3 style="margin-bottom:16px;">🎬 Загрузить видео</h3>
+                            <form onsubmit="createVideo(event)">
+                                <div class="form-group">
+                                    <label>Название урока</label>
+                                    <input type="text" id="videoTitle" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Курс</label>
+                                    <select id="videoCourse"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Видеофайл (MP4)</label>
+                                    <input type="file" id="videoFile" accept="video/mp4,video/webm,video/ogg" required>
+                                    <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+                                        Поддерживаются: MP4, WebM, OGG. Максимальный размер: 100MB
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Длительность (мин)</label>
+                                        <input type="number" id="videoDuration" value="15">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Порядок</label>
+                                        <input type="number" id="videoOrder" value="1">
+                                    </div>
+                                </div>
+                                <div style="display:flex;gap:10px;">
+                                    <button type="submit" class="btn btn-primary">Загрузить</button>
+                                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addVideoForm').style.display='none'">Отмена</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FILES -->
+                <div class="admin-section" id="section-files">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+                        <div><h1 class="page-title" style="margin-bottom:0;">📦 Исходники</h1></div>
+                        <button class="btn btn-primary" onclick="document.getElementById('addFileForm').style.display='block';document.getElementById('addFileForm').scrollIntoView({behavior:'smooth'});">+ Загрузить</button>
+                    </div>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead><tr><th>Имя</th><th>Урок</th><th>Размер</th><th>Действия</th></tr></thead>
+                            <tbody id="filesBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="addFileForm" style="display:none;margin-top:20px;">
+                        <div class="admin-form">
+                            <h3 style="margin-bottom:16px;">📦 Загрузить файл</h3>
+                            <form onsubmit="uploadFile(event)">
+                                <div class="form-group"><label>Урок</label><select id="fileLesson"></select></div>
+                                <div class="form-group"><label>Название файла</label><input type="text" id="fileName" placeholder="lesson_1_example.py"></div>
+                                <div class="form-group"><label>Файл</label><input type="file" id="fileInput" required></div>
+                                <div style="display:flex;gap:10px;">
+                                    <button type="submit" class="btn btn-primary">Загрузить</button>
+                                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addFileForm').style.display='none'">Отмена</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAYMENTS -->
+                <div class="admin-section" id="section-payments">
+                    <h1 class="page-title">💳 Оплаты</h1>
+                    <p class="page-subtitle">История транзакций</p>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead><tr><th>#</th><th>Студент</th><th>Курс</th><th>Сумма</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
+                            <tbody id="paymentsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SETTINGS -->
+                <div class="admin-section" id="section-settings">
+                    <h1 class="page-title">⚙️ Настройки</h1>
+                    <p class="page-subtitle">Настройки платформы</p>
+                    <div class="admin-form">
+                        <h3 style="margin-bottom:16px;">💳 ЮMoney (Яндекс.Деньги)</h3>
+                        <form onsubmit="savePaymentSettings(event)">
+                            <div class="form-group"><label>Номер кошелька ЮMoney</label>
+                                <input type="text" id="yoomoneyWallet" placeholder="4100111111111111">
+                            </div>
+                            <div class="form-group"><label>Тестовый режим</label>
+                                <select id="yoomoneyTestMode">
+                                    <option value="true">✅ Включен (автоподтверждение)</option>
+                                    <option value="false">❌ Выключен (ручное подтверждение)</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Сохранить</button>
+                        </form>
+                    </div>
+                    <div class="admin-form" style="margin-top:20px;">
+                        <h3 style="margin-bottom:16px;">⚙️ Общие</h3>
+                        <div class="form-group"><label>Название школы</label><input type="text" id="settingsSchoolName" value="Python School"></div>
+                        <div class="form-group"><label>Email администратора</label><input type="email" id="settingsAdminEmail" value="admin@python.school"></div>
+                        <div class="form-group"><label>Цена курса (₽)</label><input type="number" id="settingsDefaultPrice" value="4990"></div>
+                        <button class="btn btn-primary" onclick="saveSettings()">Сохранить</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="accessDenied" style="display:none;">
+        <div class="container">
+            <div class="access-denied">
+                <div class="lock-icon">🔒</div>
+                <h1>Доступ запрещён</h1>
+                <p>Только администраторы имеют доступ к этой странице. Пожалуйста, войдите как администратор.</p>
+                <button class="btn btn-primary" onclick="toggleAuth()" style="margin-top:20px;">🔐 Войти как админ</button>
+                <p style="margin-top:12px;font-size:13px;color:var(--text-muted);">
+                    👤 Админ: admin@python.school / admin123
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка входа -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAuthModal()">&times;</span>
+            <h2>🔐 Вход в систему</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="admin@python.school" required>
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Войти</button>
+                <p class="form-hint">
+                    👤 Админ: admin@python.school / admin123<br>
+                    👤 Студент: student@python.school / python123
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модалка редактирования студента -->
+    <div class="modal" id="editStudentModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="document.getElementById('editStudentModal').classList.remove('active')">&times;</span>
+            <h2>✏️ Редактировать студента</h2>
+            <form id="editStudentForm" onsubmit="updateStudent(event)">
+                <input type="hidden" id="editStudentId">
+                <div class="form-group"><label>Имя</label><input type="text" id="editStudentName" required></div>
+                <div class="form-group"><label>Email</label><input type="email" id="editStudentEmail" required></div>
+                <div class="form-group"><label>Курс</label><select id="editStudentCourse"></select></div>
+                <div class="form-group"><label>Оплата</label>
+                    <select id="editStudentPaid"><option value="true">✅ Оплачено</option><option value="false">❌ Не оплачено</option></select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

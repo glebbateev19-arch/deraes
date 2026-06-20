@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python School — Онлайн-школа программирования</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-wrapper">
+                <div class="logo">
+                    <span class="logo-icon">🐍</span>
+                    <span class="logo-text">Python<span class="highlight">School</span></span>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <a href="index.html" class="active">Главная</a>
+                    <a href="course.html">Курсы</a>
+                    <a href="dashboard.html">Личный кабинет</a>
+                    <a href="#" id="authLink" onclick="toggleAuth()">Вход</a>
+                </nav>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">🔥 НАБОР ОТКРЫТ</div>
+                    <h1>Стань <span class="gradient-text">Python-разработчиком</span> с нуля</h1>
+                    <p class="hero-description">
+                        Практический курс для начинающих и Junior-разработчиков. 
+                        Видеоуроки, исходники, домашние задания и поддержка.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <span class="stat-number" id="totalLessons">0</span>
+                            <span class="stat-label">видеоуроков</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" id="totalStudents">0</span>
+                            <span class="stat-label">студентов</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">85%</span>
+                            <span class="stat-label">доходят до финала</span>
+                        </div>
+                    </div>
+                    <div class="hero-buttons">
+                        <a href="course.html" class="btn btn-primary">Начать обучение →</a>
+                        <a href="course.html" class="btn btn-secondary">Смотреть бесплатно</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                            <span class="code-title">main.py</span>
+                        </div>
+                        <div class="code-body">
+                            <pre><span class="code-keyword">def</span> <span class="code-function">hello_python</span>():<br>    <span class="code-keyword">print</span>(<span class="code-string">"Добро пожаловать!"</span>)<br><br><span class="code-keyword">if</span> __name__ == <span class="code-string">"__main__"</span>:<br>    hello_python()</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Что вы получите</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📹</div>
+                    <h3>Качественные видео</h3>
+                    <p>Плеер с субтитрами, регулировкой скорости и полноэкранным режимом</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h3>Исходники к урокам</h3>
+                    <p>Скачивайте код всех проектов в один клик после покупки курса</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Прогресс обучения</h3>
+                    <p>Отслеживайте пройденные уроки и видите свой рост</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Поддержка</h3>
+                    <p>Чат с преподавателем и комьюнити студентов</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing">
+        <div class="container">
+            <h2 class="section-title">Старт обучения</h2>
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3>Полный курс Python</h3>
+                    <div class="price" id="coursePrice">4 990 ₽</div>
+                    <p class="price-sub">Разовый платёж • Доступ навсегда</p>
+                </div>
+                <ul class="pricing-features">
+                    <li>✅ 5+ видеоуроков</li>
+                    <li>✅ Исходники к каждому уроку</li>
+                    <li>✅ Домашние задания с проверкой</li>
+                    <li>✅ Чат с преподавателем</li>
+                    <li>✅ Сертификат об окончании</li>
+                </ul>
+                <button class="btn btn-primary btn-block" onclick="purchaseCourse()">💳 Купить курс</button>
+                <div id="paymentStatus" style="margin-top:12px;font-size:14px;color:var(--text-muted);"></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-copy">
+                    <p>© 2026 Python School. Все права защищены.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#">Политика конфиденциальности</a>
+                    <a href="#">Оферта</a>
+                    <a href="#">Контакты</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модалка входа -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAuthModal()">&times;</span>
+            <h2>🔐 Вход в систему</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="student@python.school" required>
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Войти</button>
+                <p class="form-hint">
+                    👤 Студент: student@python.school / python123<br>
+                    👤 Админ: admin@python.school / admin123
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модалка оплаты ЮMoney -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closePaymentModal()">&times;</span>
+            <h2>💳 Оплата через ЮMoney</h2>
+            <div id="paymentModalContent">
+                <p>Вы оплачиваете курс: <strong>Python для начинающих</strong></p>
+                <p style="font-size:28px;font-weight:700;color:var(--primary-light);" id="paymentAmount">4 990 ₽</p>
+                <div style="background:var(--bg-dark);padding:16px;border-radius:10px;margin:16px 0;text-align:left;">
+                    <p style="font-size:13px;color:var(--text-secondary);">💳 Для оплаты переведите сумму на кошелёк ЮMoney:</p>
+                    <p style="font-size:18px;font-weight:600;color:var(--primary-light);">4100111111111111</p>
+                    <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">В комментарии укажите ваш email</p>
+                </div>
+                <button class="btn btn-success btn-block" onclick="processPayment()">
+                    ✅ Я оплатил(а), проверить
+                </button>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">
+                    🔒 После оплаты нажмите "Проверить" — доступ откроется автоматически
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
